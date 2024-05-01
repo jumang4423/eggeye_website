@@ -93,7 +93,7 @@ function Header() {
         style={{
           marginTop: "0px",
           justifyContent: "center",
-          fontSize: "48px",
+          fontSize: "85px",
           alignItems: "center",
           flexDirection: "column",
         }}
@@ -107,18 +107,16 @@ function Header() {
 function Link({ children, href }: { children: any; href: string }) {
   return (
     <motion.a
-      initial={{ scale: 1.0 }}
-      whileHover={{ scale: 1.25 }}
+      initial={{ x: 10 }}
+      whileHover={{ x: -400 }}
       href={href}
       target="_blank"
       rel="noreferrer"
       style={{
-        marginLeft: "8px",
-        color: "white",
-        backgroundColor: "lightgreen",
-        fontSize: "20px",
-        textDecoration: "underline",
-        fontWeight: "normal",
+        color: "black",
+        fontSize: "256px",
+        display: "inline-block",
+        whiteSpace: "nowrap",
       }}
     >
       {children}
@@ -167,30 +165,31 @@ function SoundCloudLinkCard({
 
 function SNS() {
   return (
-    <div
-      style={{ display: "flex", paddingTop: "8px", flexDirection: "column" }}
-    >
+    <div style={{ marginTop: "-32px" }}>
       <div
         style={{
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          fontSize: "80px",
+          marginBottom: "-128px",
         }}
       >
         --- sns ---
       </div>
       <div
         style={{
-          justifyContent: "center",
-          display: "flex",
+          flexDirection: "column",
+          overflowX: "hidden",
+          overflowY: "hidden",
+          lineHeight: "-256px",
+          marginTop: "128px",
+          width: "100%",
         }}
       >
-        <Link href="https://twitter.com/ggeyegg">鳥 twitter</Link>
-        <Link href="http://instagram.com/eggeyegge">印 instagram</Link>
-        <Link href="http://twitter.com/@eggeyegge">妖 youtube</Link>
-      </div>
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        ------------
+        <Link href="https://twitter.com/ggeyegg">👉 X, Twitter</Link>
+        <Link href="http://instagram.com/eggeyegge">👉 Instagram</Link>
+        <Link href="https://www.youtube.com/@eggeyegge">👉 Youtube</Link>
       </div>
     </div>
   );
@@ -207,86 +206,58 @@ function Description() {
   );
 }
 
+const useProgressiveImage = (src: string) => {
+  const [sourceLoaded, setSourceLoaded] = useState<string | null>(null);
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = src;
+    setSourceLoaded(null);
+    img.onload = () => setSourceLoaded(src);
+  }, [src]);
+
+  return sourceLoaded;
+};
+
 function RandomImage() {
-  const [curImg, setCurImg] = useState("/random/hands.png");
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [rndstr, setRndstr] = useState("");
-  const shuffleStr = () => {
-    const str1 = "?";
-    const str2 = "¿";
-    // all, 24 strs
-    const strs = [];
-    for (let i = 0; i < 24; i++) {
-      // random vle
-      const rnd = Math.random();
-      if (rnd < 0.5) {
-        strs.push(str1);
-      } else {
-        strs.push(str2);
-      }
-    }
-    const str = strs.join("");
-    setRndstr(str);
+  const [clock, setClock] = useState(0);
+  const [curImg, setCurImg] = useState("/random/0196.png");
+  const [size, setSize] = useState(24);
+  const loaded = useProgressiveImage(curImg);
+  const onNewImg = () => {
+    const randomIndex = Math.floor(Math.random() * randomImgs.length);
+    const randomSize = Math.floor(Math.random() * 24) + 4;
+    setCurImg(randomImgs[randomIndex]);
+    setSize(randomSize);
   };
+
   useEffect(() => {
     const id = setInterval(() => {
-      shuffleStr();
-    }, 50);
+      onNewImg();
+    }, 5000);
+    // 30 fps
+    const clockId = setInterval(() => {
+      setClock((prev) => prev + 1);
+    }, 1000 / 60);
     return () => {
       clearInterval(id);
+      clearInterval(clockId);
     };
   }, []);
 
   return (
     <div style={{ margin: "16px" }}>
-      <motion.img
-        src={curImg}
+      <motion.div
         style={{
+          height: "512px",
           width: "100%",
-          objectFit: "cover",
           marginTop: "16px",
-          display: isLoaded ? "block" : "none",
-        }}
-        onLoad={() => {
-          setIsLoaded(true);
+          backgroundImage: `url(${loaded || "/rainbow.png"})`,
+          backgroundRepeat: "repeat",
+          backgroundSize: `${size}rem`,
+          backgroundPosition: `${clock * 2}px ${clock * 2}px`,
         }}
       />
-      {!isLoaded && (
-        <motion.div
-          initial={{ scale: 0.5 }}
-          animate={{ scale: 2.0 }}
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "200px",
-            width: "100%",
-            fontSize: "30px",
-          }}
-        >
-          loading...
-        </motion.div>
-      )}
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <motion.button
-          whileHover={{
-            filter: "hue-rotate(720000deg)",
-          }}
-          style={{
-            borderRadius: "0px",
-            backgroundColor: "lightgreen",
-            color: "white",
-            marginTop: "16px",
-          }}
-          onClick={() => {
-            const randomIndex = Math.floor(Math.random() * randomImgs.length);
-            setCurImg(randomImgs[randomIndex]);
-            setIsLoaded(false);
-          }}
-        >
-          {"=>"} {rndstr} {`<=`}
-        </motion.button>
-      </div>
     </div>
   );
 }
@@ -295,7 +266,7 @@ const displayHackerDefenceConsole = () => {
   const consoleText = `?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿`;
   console.log(
     `%c${consoleText}`,
-    "background-color: rgb(255, 164, 244); color: white; font-size: 24px; border-radius: 8px; padding: 8px;"
+    "background-color: #8bffd6; color: white; font-size: 24px; border-radius: 8px; padding: 8px;"
   );
 };
 
@@ -306,21 +277,21 @@ function App() {
   return (
     <div
       style={{
-        fontFamily: "Iosevka Aile Iaso, Transparent",
+        fontFamily: "Rubik Lines, Transparent",
         maxWidth: "500px",
-        fontSize: "18px",
         backgroundColor: "white",
-        height: "100vh",
       }}
     >
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link
+        href="https://fonts.googleapis.com/css2?family=Libre+Barcode+128+Text&family=Rubik+Lines&family=Sixtyfour&display=swap"
         rel="stylesheet"
-        href="https://cdn.xeiaso.net/static/css/iosevka/family.css"
       />
-      <SNS />
+      <div style={{ height: "32px" }}></div>
       <Header />
       <RandomImage />
-      <Description />
+      <SNS />
+      <div style={{ height: "64px" }}></div>
     </div>
   );
 }
